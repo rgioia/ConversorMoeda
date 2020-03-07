@@ -4,7 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 
-const request = "https://api.hgbrasil.com/finance?format=json&key=e4131a6e";
+const request = "https://api.hgbrasil.com/finance?format=json&key=36468291";
 
 void main() async {
   runApp(MaterialApp(
@@ -14,9 +14,9 @@ void main() async {
         primaryColor: Colors.white,
         inputDecorationTheme: InputDecorationTheme(
           enabledBorder:
-          OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+              OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
           focusedBorder:
-          OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+              OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
           hintStyle: TextStyle(color: Colors.black),
         )),
   ));
@@ -37,13 +37,11 @@ class _HomeState extends State<Home> {
       decimalSeparator: ',', thousandSeparator: '.');
   var dolarController = new MoneyMaskedTextController(
       decimalSeparator: ',', thousandSeparator: '.');
-  var taxApplyController = new MoneyMaskedTextController(
-      decimalSeparator: ',', thousandSeparator: '.');
 
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   double dolar;
-  String _taxApply;
+  String _taxApply = '-';
 
   void _realChanged(String text) {
     double real = realController.numberValue;
@@ -67,11 +65,16 @@ class _HomeState extends State<Home> {
     } else {
       realController.updateValue(0.0);
     }
+    _taxApply = (dolarBuy / dolar).toStringAsFixed(4);
+
+    setState(() {
+      if(_taxApply == 'NaN') {
+        _taxApply = '-';
+      }
+    });
   }
 
-  void _processRequest() {
-
-  }
+  void _processRequest() {}
 
   @override
   Widget build(BuildContext context) {
@@ -87,25 +90,27 @@ class _HomeState extends State<Home> {
             builder: (context, snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.none:
-                case ConnectionState.waiting:
-                  return Center(
-                      child: Text(
-                        'Carregando dados...',
-                        style: TextStyle(color: Colors.black, fontSize: 25.0),
-                        textAlign: TextAlign.center,
-                      ));
                 default:
                   if (snapshot.hasError) {
                     return Center(
                         child: Text(
-                          'Erro ao carregar dados :(',
-                          style: TextStyle(color: Colors.black, fontSize: 25.0),
-                          textAlign: TextAlign.center,
-                        ));
+                      'Erro ao carregar dados :(',
+                      style: TextStyle(color: Colors.black, fontSize: 25.0),
+                      textAlign: TextAlign.center,
+                    ));
                   } else {
-                    dolar =
-                    snapshot.data["results"]["currencies"]["USD"]["buy"];
-
+                    if(snapshot.data != null){
+                      if(snapshot.data['error'] == true){
+                        return Center(
+                            child: Text(
+                              'Erro ao carregar dados :(',
+                              style: TextStyle(color: Colors.black, fontSize: 25.0),
+                              textAlign: TextAlign.center,
+                            ));
+                      } else {
+                        dolar = snapshot.data["results"]["currencies"]["USD"]["buy"];
+                      }
+                    }
                     return SingleChildScrollView(
                         padding: EdgeInsets.all(10.0),
                         child: Form(
@@ -121,26 +126,23 @@ class _HomeState extends State<Home> {
                                       height: 100,
                                       width: 100,
                                     )),
-                                buildTextField('Dólares',
-                                    dolarController, _dolarChanged, true),
+                                buildTextField('Dólares', dolarController,
+                                    _dolarChanged, true),
                                 Divider(),
                                 buildTextField("Reais", realController,
                                     _realChanged, false),
                                 Container(
-                                  padding: EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 10.0),
-                                  child: Row(
-                                      children: <Widget>[
-                                        Icon(
-                                          Icons.info_outline, size: 20.0,
-                                          color: Colors.green,
-                                        ),
-                                        Text('Taxa utilizada: $_taxApply',
-                                            style: TextStyle(
-                                                fontSize: 15.0
-                                            )
-                                        )
-                                      ]
-                                  ),
+                                  padding:
+                                      EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 10.0),
+                                  child: Row(children: <Widget>[
+                                    Icon(
+                                      Icons.info_outline,
+                                      size: 20.0,
+                                      color: Colors.green,
+                                    ),
+                                    Text('Taxa utilizada: $_taxApply',
+                                        style: TextStyle(fontSize: 15.0))
+                                  ]),
                                 ),
                                 Container(
                                   padding: EdgeInsets.only(top: 8.0),
@@ -166,21 +168,15 @@ class _HomeState extends State<Home> {
   }
 }
 
-Widget taxesApply(String label){
-  setState();
-}
-
-
-Widget buildTextField(String label,
-    MoneyMaskedTextController controller, Function f, bool isEnabled) {
+Widget buildTextField(String label, MoneyMaskedTextController controller,
+    Function f, bool isEnabled) {
   return TextFormField(
     controller: controller,
     enabled: isEnabled,
     decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(color: Colors.black),
-        border: OutlineInputBorder()
-    ),
+        border: OutlineInputBorder()),
     style: TextStyle(color: Colors.black, fontSize: 25.0),
     onChanged: f,
     validator: (String value) {
