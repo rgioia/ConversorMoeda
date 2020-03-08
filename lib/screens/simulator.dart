@@ -13,6 +13,16 @@ Future<Map> getData() async {
   return json.decode(response.body);
 }
 
+Future<bool> sendNotification(body) async{
+  http.Response response = await http.get("https://viacep.com.br/ws/01001000/json/");
+
+  if (response.statusCode == 200) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 class Simulator extends StatefulWidget {
   final String name;
   final String cellPhone;
@@ -147,7 +157,49 @@ class _SimulatorState extends State<Simulator> {
                                             color: Colors.white)),
                                     onPressed: () {
                                       if (_formKey.currentState.validate()) {
-                                        _processRequest(context, name, emailAddress, cellPhone, dolarPrice, realPrice);
+                                        final body = {
+                                          "name": name,
+                                          "emailAddress": emailAddress,
+                                          "cellPhone": cellPhone,
+                                          "dolarPrice": dolarPrice,
+                                          "realPrice": realPrice
+                                        };
+                                        sendNotification(body).then((success) {
+                                          if (success) {
+                                            showDialog(
+                                              builder: (context) => AlertDialog(
+                                                title: Text('Recebemos o seu contato, logo nossa equipe estará entrando em contato com você!'),
+                                                actions: <Widget>[
+                                                  FlatButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                      _processRequest(context, name, emailAddress, cellPhone, dolarPrice, realPrice);
+                                                    },
+                                                    child: Text('OK'),
+                                                  )
+                                                ],
+                                              ),
+                                              context: context,
+                                            );
+                                            return;
+                                        }else{
+                                            showDialog(
+                                              builder: (context) => AlertDialog(
+                                                title: Text('Ocorreu um erro inesperado'),
+                                                actions: <Widget>[
+                                                  FlatButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: Text('OK'),
+                                                  )
+                                                ],
+                                              ),
+                                              context: context,
+                                            );
+                                            return;
+                                          }
+                                        });
                                       }
                                     },
                                   ),
