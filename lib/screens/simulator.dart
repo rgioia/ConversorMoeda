@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:conversor_moeda/review.dart';
+import 'package:conversor_moeda/screens/review.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
-import 'package:conversor_moeda/moneyMask.dart';
+import 'package:conversor_moeda/widgets/moneyMask.dart';
 
-const request = "https://api.hgbrasil.com/finance?format=json&key=98a674d77";
+const request = "https://api.hgbrasil.com/finance?format=json&key=98a67d77";
 
 Future<Map> getData() async {
   http.Response response = await http.get(request);
@@ -58,14 +58,14 @@ class _SimulatorState extends State<Simulator> {
       taxApplyController.updateValue(0.0);
     }
 
-    realPrice  = dolarBuy.toStringAsFixed(2);
-    dolarPrice = dolar.toStringAsFixed(2);
+    realPrice  = realController.text;
+    dolarPrice = dolarController.text;
   }
 
-  void _processRequest(context, name, cellPhone, emailAddress, dolarPrice, realPrice) {
+  void _processRequest(context, name, emailAddress, cellPhone, dolarPrice, realPrice) {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => Review(
-        name: name, cellPhone: cellPhone, emailAddress: emailAddress, dolarPrice: dolarPrice, realPrice: realPrice
+        name: name, emailAddress: emailAddress, cellPhone: cellPhone, dolarPrice: dolarPrice, realPrice: realPrice
     )));
   }
 
@@ -147,7 +147,7 @@ class _SimulatorState extends State<Simulator> {
                                             color: Colors.white)),
                                     onPressed: () {
                                       if (_formKey.currentState.validate()) {
-                                        _processRequest(context, name, cellPhone, emailAddress, dolarPrice, realPrice);
+                                        _processRequest(context, name, emailAddress, cellPhone, dolarPrice, realPrice);
                                       }
                                     },
                                   ),

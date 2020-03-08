@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:conversor_moeda/home.dart';
+import 'package:conversor_moeda/screens/home.dart';
 
 void main() async {
   runApp(MaterialApp(

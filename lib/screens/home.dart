@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:conversor_moeda/simulator.dart';
+import 'package:conversor_moeda/screens/simulator.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:email_validator/email_validator.dart';
 
@@ -32,9 +32,9 @@ class _HomeState extends State<Home> {
     emailAddress = text;
   }
 
-  void _processToSimulation(context, name, cellPhone, emailAddress) {
+  void _processToSimulation(context, name, emailAddress, cellPhone) {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => Simulator(name: name, cellPhone: cellPhone, emailAddress: emailAddress ))
+        context, MaterialPageRoute(builder: (context) => Simulator(name: name, emailAddress: emailAddress, cellPhone: cellPhone))
     );
   }
 
