@@ -1,5 +1,5 @@
 name: conversor_moeda
-description: Conversor de moedas
+description: Mainô Câmbio
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -26,10 +26,17 @@ dependencies:
   http: ^0.12.0+2
   flutter_masked_text: ^0.8.0
   email_validator: '^1.0.0'
+  sentry: ">=3.0.0 <4.0.0"
 
 dev_dependencies:
+  flutter_launcher_icons: "^0.7.3"
   flutter_test:
     sdk: flutter
+
+flutter_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: "laucher/ic_launcher.png"
 
 
 # For information on the generic Dart part of this file, see the
