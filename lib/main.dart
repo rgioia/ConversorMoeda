@@ -1,10 +1,11 @@
+import 'package:conversor_moeda/review.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 
-const request = "https://api.hgbrasil.com/finance?format=json&key=36468291";
+const request = "https://api.hgbrasil.com/finance?format=json&key=98a674d77";
 
 void main() async {
   runApp(MaterialApp(
@@ -37,23 +38,13 @@ class _HomeState extends State<Home> {
       decimalSeparator: ',', thousandSeparator: '.');
   var dolarController = new MoneyMaskedTextController(
       decimalSeparator: ',', thousandSeparator: '.');
+  var taxApplyController = new MoneyMaskedTextController(
+      decimalSeparator: ',', thousandSeparator: '.', precision: 4);
 
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   double dolar;
-  String _taxApply = '-';
-
-  void _realChanged(String text) {
-    double real = realController.numberValue;
-    double spred = this.dolar + (this.dolar * 0.015);
-    double finalTax = spred + ((20 / (real / this.dolar)) * this.dolar);
-    double realBuy = real / finalTax;
-    if (real != 0.0) {
-      dolarController.updateValue(realBuy);
-    } else {
-      dolarController.updateValue(0.0);
-    }
-  }
+  String paramDolarBuy;
 
   void _dolarChanged(String text) {
     double dolar = dolarController.numberValue;
@@ -62,19 +53,18 @@ class _HomeState extends State<Home> {
     double dolarBuy = dolar * finalTax;
     if (dolar != 0.0) {
       realController.updateValue(dolarBuy);
+      taxApplyController.updateValue(dolarBuy / dolar);
     } else {
       realController.updateValue(0.0);
+      taxApplyController.updateValue(0.0);
     }
-    _taxApply = (dolarBuy / dolar).toStringAsFixed(4);
 
-    setState(() {
-      if(_taxApply == 'NaN') {
-        _taxApply = '-';
-      }
-    });
+    paramDolarBuy = dolarBuy.toStringAsFixed(2);
   }
 
-  void _processRequest() {}
+  void _processRequest(context, dolar) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => Review(dolar: dolar)));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,6 +80,13 @@ class _HomeState extends State<Home> {
             builder: (context, snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.none:
+                case ConnectionState.waiting:
+                  return Center(
+                      child: Text(
+                        'Carregando dados...',
+                        style: TextStyle(color: Colors.black, fontSize: 25.0),
+                        textAlign: TextAlign.center,
+                      ));
                 default:
                   if (snapshot.hasError) {
                     return Center(
@@ -99,18 +96,8 @@ class _HomeState extends State<Home> {
                       textAlign: TextAlign.center,
                     ));
                   } else {
-                    if(snapshot.data != null){
-                      if(snapshot.data['error'] == true){
-                        return Center(
-                            child: Text(
-                              'Erro ao carregar dados :(',
-                              style: TextStyle(color: Colors.black, fontSize: 25.0),
-                              textAlign: TextAlign.center,
-                            ));
-                      } else {
-                        dolar = snapshot.data["results"]["currencies"]["USD"]["buy"];
-                      }
-                    }
+                    dolar = snapshot.data["results"]["currencies"]["USD"]["buy"];
+
                     return SingleChildScrollView(
                         padding: EdgeInsets.all(10.0),
                         child: Form(
@@ -130,19 +117,21 @@ class _HomeState extends State<Home> {
                                     _dolarChanged, true),
                                 Divider(),
                                 buildTextField("Reais", realController,
-                                    _realChanged, false),
-                                Container(
-                                  padding:
-                                      EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 10.0),
-                                  child: Row(children: <Widget>[
-                                    Icon(
-                                      Icons.info_outline,
-                                      size: 20.0,
-                                      color: Colors.green,
+                                    null, false),
+                                Column(
+                                  children: <Widget>[
+                                    Container(
+                                      height: 40.0,
+                                      child: TextField(
+                                          controller: taxApplyController,
+                                          enabled: false,
+                                          decoration: InputDecoration(
+                                            border: InputBorder.none,
+                                            prefix: Text('Taxa utilizada: '),
+                                          ),
+                                      )
                                     ),
-                                    Text('Taxa utilizada: $_taxApply',
-                                        style: TextStyle(fontSize: 15.0))
-                                  ]),
+                                  ],
                                 ),
                                 Container(
                                   padding: EdgeInsets.only(top: 8.0),
@@ -155,7 +144,7 @@ class _HomeState extends State<Home> {
                                             color: Colors.white)),
                                     onPressed: () {
                                       if (_formKey.currentState.validate()) {
-                                        _processRequest();
+                                        _processRequest(context, paramDolarBuy);
                                       }
                                     },
                                   ),
