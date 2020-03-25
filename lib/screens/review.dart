@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:conversor_moeda/widgets/moneyMask.dart';
+import 'package:intl/intl.dart';
 
 class Review extends StatelessWidget {
 
@@ -8,6 +8,8 @@ class Review extends StatelessWidget {
   final String name;
   final String cellPhone;
   final String emailAddress;
+
+  String dateSimulation = new DateFormat("dd/MM/yyyy - HH:mm:ss").format(DateTime.now());
 
   Review({@required this.name, @required this.cellPhone, @required this.emailAddress, @required this.dolarPrice, @required this.realPrice});
 
@@ -52,6 +54,14 @@ class Review extends StatelessWidget {
                   Text('Quantidade de dólares: US\$ $dolarPrice', style: TextStyle(color: Colors.black, fontSize: 17.0)),
                   Divider(),
                   Text('Valores em real: BRL $realPrice', style: TextStyle(color: Colors.black, fontSize: 17.0)),
+                  Divider(),
+                  Container(
+                    alignment: Alignment.center, 
+                    child: Text(
+                      '$dateSimulation', textAlign: TextAlign.center, style: TextStyle(color: Colors.black, fontSize: 15.0
+                      )
+                    )
+                  )
                 ],
               ),
             )

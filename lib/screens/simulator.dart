@@ -110,7 +110,7 @@ class _SimulatorState extends State<Simulator> {
                     ));
                   } else {
                     dolar =
-                        snapshot.data["results"]["currencies"]["USD"]["buy"];
+                        snapshot.data["results"]["currencies"]["USD"]["sell"];
 
                     return SingleChildScrollView(
                         padding: EdgeInsets.all(10.0),
@@ -127,11 +127,40 @@ class _SimulatorState extends State<Simulator> {
                                       height: 100,
                                       width: 100,
                                     )),
-                                buildTextField('Dólares', dolarController,
+                                Container(
+                                  alignment: Alignment.center,
+                                  padding: EdgeInsets.all(5.0),
+                                  decoration: new BoxDecoration(
+                                      borderRadius:BorderRadius.all(Radius.circular(2.0)),
+                                      border: new Border.all(color: Colors.black)
+                                  ),
+                                  child: DropdownButton<String>(
+                                    underline: Container(
+                                      height: 0,
+                                      color: Colors.black,
+                                    ),
+                                    value: 'Dólar americano',
+                                    icon: Icon(Icons.arrow_downward),
+                                    iconSize: 24,
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 25.0),
+                                    items: <String>['Dólar americano']
+                                      .map<DropdownMenuItem<String>>((String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(value),
+                                        );
+                                      })
+                                      .toList(), onChanged: (String value) {},
+                                  ),
+                                ),
+                                Divider(),
+                                buildTextField('Valor da remessa', dolarController,
                                     _dolarChanged, true),
                                 Divider(),
                                 buildTextField(
-                                    "Reais", realController, null, false),
+                                    "Valor em R\$", realController, null, false),
                                 Column(
                                   children: <Widget>[
                                     Container(
@@ -151,7 +180,7 @@ class _SimulatorState extends State<Simulator> {
                                   height: 50.0,
                                   child: RaisedButton(
                                     color: Colors.green,
-                                    child: Text('Solicitar contato',
+                                    child: Text('Solicitar fechamento',
                                         style: TextStyle(
                                             fontSize: 20.0,
                                             color: Colors.white)),
@@ -168,7 +197,7 @@ class _SimulatorState extends State<Simulator> {
                                           if (success) {
                                             showDialog(
                                               builder: (context) => AlertDialog(
-                                                title: Text('Recebemos o seu contato, logo nossa equipe estará entrando em contato com você!'),
+                                                title: Text('Obrigado! Em alguns minutos entraremos em contato para realizar o fechamento de câmbio.'),
                                                 actions: <Widget>[
                                                   FlatButton(
                                                     onPressed: () {

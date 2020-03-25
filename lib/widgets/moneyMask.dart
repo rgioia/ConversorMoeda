@@ -13,8 +13,8 @@ Widget buildTextField(String label, MoneyMaskedTextController controller,
     style: TextStyle(color: Colors.black, fontSize: 25.0),
     onChanged: f,
     validator: (String value) {
-      if (controller.numberValue <= 0.0) {
-        return "O valor deve ser maior que 0,00";
+      if (controller.numberValue < 100.0) {
+        return "O valor deve ser a partir de 100,00";
       }
       return null;
     },

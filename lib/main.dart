@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:conversor_moeda/screens/home.dart';
-
 import 'package:sentry/sentry.dart';
 
 final SentryClient sentry = new SentryClient(
